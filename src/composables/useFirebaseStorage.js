@@ -14,7 +14,7 @@ export function useFirebaseStorage() {
     try {
       uploadStatus.value = { status: "uploading", error: null };
 
-      const fileName = `${file.name}`;
+      const fileName = `${uuidv4()}-${file.name}`;
       const fileRef = storageRef(storage, path + "/" + fileName);
 
       const snapshot = await uploadBytes(fileRef, file);

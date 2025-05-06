@@ -28,10 +28,6 @@ const uploadStatus = ref({
   homeAssets: { status: "pending", error: null },
 });
 
-onMounted(() => {
-  homeId.value = uuidv4();
-});
-
 const steps = [
   { id: 1, name: "Home Details" },
   { id: 2, name: "Assets" },
@@ -85,6 +81,7 @@ const handleHomeDetailsComplete = (data) => {
   console.log("handleHomeDetailsComplete");
 
   homeName.value = data.homeName;
+  homeId.value = data.homeId;
   utilityBillFullpath.value = data.utilityBillFullpath;
 
   nextStep();
@@ -193,7 +190,6 @@ const handleAssetsComplete = (urls) => {
             <!-- Step 1: Home Details -->
             <HomeDetails
               v-if="currentStep === 1"
-              :home-id="homeId"
               @homeDetailsComplete="handleHomeDetailsComplete"
             />
 

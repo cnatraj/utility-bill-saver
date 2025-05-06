@@ -1,21 +1,16 @@
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { useAuthStore } from "../../../stores/auth";
 import { useFirebaseStorage } from "../../../composables/useFirebaseStorage";
+import HomeService from "../../../services/home.service";
 
 const { uploadFile, uploadStatus } = useFirebaseStorage();
-
-const props = defineProps({
-  homeId: {
-    type: String,
-    required: true,
-  },
-});
 
 const emit = defineEmits(["homeDetailsComplete"]);
 
 const authStore = useAuthStore();
 const homeName = ref("");
+const homeId = ref(null);
 const utilityBillFullpath = ref(null);
 const selectedBillFile = ref(null);
 const billPreviewUrl = ref(null);
@@ -33,7 +28,7 @@ const handleBillSelect = async (event) => {
 
     try {
       const userId = authStore.user.id;
-      const storagePath = `users/${userId}/homes/${props.homeId}/utilityBills`;
+      const storagePath = `users/${userId}/homes/${homeId.value}/utilityBills`;
       utilityBillFullpath.value = await uploadFile(file, storagePath);
       console.log("utilityBillFullpath.value", utilityBillFullpath.value);
       console.log("uploadStatus", uploadStatus);
@@ -43,11 +38,34 @@ const handleBillSelect = async (event) => {
   }
 };
 
-const handleNext = () => {
-  emit("homeDetailsComplete", {
-    homeName: homeName.value,
-    utilityBillFullpath: utilityBillFullpath.value,
-  });
+const createHome = async () => {
+  try {
+    const userId = authStore.user.id;
+    const homeData = {
+      userId: userId,
+      name: homeName.value,
+    };
+    const newHome = await HomeService.setHome(homeId.value, homeData);
+    return newHome;
+  } catch (error) {
+    console.error("Error creating home:", error);
+    // Handle error appropriately (e.g., display an error message)
+    throw error;
+  }
+};
+
+const handleNext = async () => {
+  try {
+    const newHome = await createHome();
+
+    emit("homeDetailsComplete", {
+      homeName: homeName.value,
+      utilityBillFullpath: utilityBillFullpath.value,
+      homeId: newHome.id,
+    });
+  } catch (error) {
+    console.error("Error in handleNext:", error);
+  }
 };
 const handleDragOver = (event) => {
   event.preventDefault();
@@ -71,6 +89,10 @@ const clearBillFile = () => {
     billPreviewUrl.value = null;
   }
 };
+
+onMounted(async () => {
+  homeId.value = await HomeService.getHomeId();
+});
 </script>
 
 <template>
