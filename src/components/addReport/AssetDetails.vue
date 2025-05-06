@@ -1,8 +1,14 @@
 <script setup>
 import { ref, computed } from "vue";
-import { useAuthStore } from "../../../stores/auth";
-import { useFirebaseStorage } from "../../../composables/useFirebaseStorage";
-import homeAssetChecklist from "../../../configs/homeAssetChecklist";
+import { useAuthStore } from "@/stores/auth";
+import { useFirebaseStorage } from "@/composables/useFirebaseStorage";
+import homeAssetChecklist from "@/configs/homeAssetChecklist";
+import {
+  CameraIcon,
+  XMarkIcon,
+  CheckIcon,
+  ExclamationTriangleIcon,
+} from "@heroicons/vue/24/outline";
 
 const props = defineProps({
   homeId: {
@@ -127,26 +133,7 @@ const handlePrevious = () => {
       <!-- Asset sections -->
       <div v-for="asset in homeAssetChecklist" :key="asset.id" class="mb-8">
         <div class="flex items-start mb-2">
-          <div class="flex-shrink-0">
-            <div
-              class="w-8 h-8 rounded-lg bg-primary-100 flex items-center justify-center"
-            >
-              <svg
-                class="w-5 h-5 text-primary-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"
-                />
-              </svg>
-            </div>
-          </div>
-          <div class="ml-4">
+          <div>
             <h3 class="text-lg font-medium text-gray-900">{{ asset.label }}</h3>
             <p class="text-sm text-gray-500">{{ asset.description }}</p>
           </div>
@@ -199,19 +186,7 @@ const handlePrevious = () => {
               class="absolute top-0.5 right-0.5 bg-white text-error-500 rounded-full p-1 shadow-md hover:bg-error-50 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-error-500"
               @click="removeAppliancePhoto(asset.id, index)"
             >
-              <svg
-                class="w-3 h-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <XMarkIcon class="w-3 h-3" />
             </button>
 
             <!-- Upload Status Indicator -->
@@ -219,37 +194,13 @@ const handlePrevious = () => {
               v-if="photo.uploadStatus === 'complete'"
               class="absolute bottom-0.5 right-0.5 bg-success-500 text-white rounded-full p-1 shadow-md"
             >
-              <svg
-                class="w-3 h-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
+              <CheckIcon class="w-3 h-3" />
             </div>
             <div
               v-if="photo.uploadStatus === 'error'"
               class="absolute bottom-0.5 right-0.5 bg-error-500 text-white rounded-full p-1 shadow-md"
             >
-              <svg
-                class="w-3 h-3"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
+              <ExclamationTriangleIcon class="w-6 h-6" />
             </div>
           </div>
 
@@ -258,19 +209,8 @@ const handlePrevious = () => {
             class="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 hover:border-primary-400 cursor-pointer flex items-center justify-center bg-gray-50 hover:bg-gray-100 transition-colors duration-150"
           >
             <div class="text-center">
-              <svg
-                class="mx-auto h-6 w-6 text-gray-400"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 4v16m8-8H4"
-                />
-              </svg>
+              <CameraIcon class="text-gray-400" />
+
               <span class="mt-1 block text-xs font-medium text-gray-600">
                 Add
               </span>

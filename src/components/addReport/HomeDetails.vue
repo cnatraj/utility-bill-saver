@@ -1,8 +1,8 @@
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
-import { useAuthStore } from "../../../stores/auth";
-import { useFirebaseStorage } from "../../../composables/useFirebaseStorage";
-import HomeService from "../../../services/home.service";
+import { useAuthStore } from "@/stores/auth";
+import { useFirebaseStorage } from "@/composables/useFirebaseStorage";
+import HomeService from "@/services/home.service";
 
 const { uploadFile, uploadStatus } = useFirebaseStorage();
 

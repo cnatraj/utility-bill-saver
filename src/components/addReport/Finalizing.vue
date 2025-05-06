@@ -1,9 +1,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { v4 as uuidv4 } from "uuid";
-import OpenAIService from "../../../services/openai.service";
-import ReportService from "../../../services/report.service";
-import statusMessages from "../../../configs/statusMessages";
+import OpenAIService from "@/services/openai.service";
+import ReportService from "@/services/report.service";
+import statusMessages from "@/configs/statusMessages";
 import { CheckIcon, ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
 import { useRouter } from "vue-router";
 

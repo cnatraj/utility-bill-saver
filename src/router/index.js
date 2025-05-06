@@ -11,6 +11,7 @@ import BillAnalysisView from "../views/BillAnalysisView.vue";
 import RecommendationsView from "../views/RecommendationsView.vue";
 import RebatesView from "../views/RebatesView.vue";
 import ReportView from "../views/ReportView.vue";
+import CreateReportView from "../views/CreateReportView.vue";
 
 // Auth Views
 import LoginView from "../views/auth/LoginView.vue";
@@ -33,6 +34,12 @@ const routes = [
     path: "/report",
     name: "report",
     component: ReportView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/create-report",
+    name: "createReport",
+    component: CreateReportView,
     meta: { requiresAuth: true },
   },
   {
