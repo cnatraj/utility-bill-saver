@@ -55,9 +55,9 @@ const logout = async () => {
           </div>
 
           <!-- Home Selector -->
-          <div class="ml-6">
+          <!-- <div class="ml-6">
             <HomeDropdown />
-          </div>
+          </div> -->
 
           <!-- Desktop Navigation -->
           <nav class="hidden md:ml-6 md:flex md:space-x-8">

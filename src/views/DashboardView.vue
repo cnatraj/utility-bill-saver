@@ -23,7 +23,7 @@ const user = computed(() => authStore.user);
 
 // Create new report
 const createNewReport = () => {
-  router.push("/bill-analysis");
+  router.push("/create-report");
 };
 
 // Fetch data on component mount
@@ -136,7 +136,7 @@ const savingsProgress = computed(() => {
       <div
         class="card p-6 mb-8 bg-gradient-to-r from-primary-50 to-primary-100 border border-primary-200"
       >
-        <div class="flex items-start justify-between">
+        <div class="flex flex-col sm:flex-row items-start justify-between">
           <div>
             <h2 class="text-xl font-bold text-gray-900 mb-2">
               Ready to Slash Your Energy Costs?
@@ -148,7 +148,7 @@ const savingsProgress = computed(() => {
           </div>
           <button
             @click="createNewReport"
-            class="btn-primary flex items-center"
+            class="btn-primary flex items-center justify-center w-full sm:w-auto mt-4 sm:mt-0"
           >
             <PlusIcon class="h-5 w-5 mr-2" />
             Get Started

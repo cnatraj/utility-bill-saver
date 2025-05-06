@@ -47,7 +47,7 @@
           <router-link
             :to="link.path"
             class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-            @click="isMobileMenuOpen = false"
+            @click="isProfileMenuOpen = false"
             v-for="link in props.navLinks"
             :key="link.path"
           >
