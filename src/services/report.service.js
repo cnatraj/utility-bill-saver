@@ -1,5 +1,5 @@
 import { db } from "../lib/firebase";
-import { collection, addDoc, getDoc } from "firebase/firestore";
+import { collection, addDoc, getDoc, doc } from "firebase/firestore";
 
 class ReportService {
   async createReport(homeId, reportData) {
@@ -21,6 +21,25 @@ class ReportService {
       };
     } catch (error) {
       console.error("Error creating report:", error);
+      throw error;
+    }
+  }
+
+  async getReport(homeId, reportId) {
+    try {
+      const reportRef = doc(db, "homes", homeId, "reports", reportId);
+      const reportDoc = await getDoc(reportRef);
+
+      if (!reportDoc.exists()) {
+        throw new Error("Report not found");
+      }
+
+      return {
+        id: reportDoc.id,
+        ...reportDoc.data(),
+      };
+    } catch (error) {
+      console.error("Error getting report:", error);
       throw error;
     }
   }

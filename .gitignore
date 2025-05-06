@@ -70,3 +70,6 @@ node_modules/
 
 #firebase functions
 /functions
+
+#Build folder
+/dist
