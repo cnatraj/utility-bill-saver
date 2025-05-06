@@ -1,12 +1,13 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from "vue";
 import { v4 as uuidv4 } from "uuid";
-import { db } from "../../../lib/firebase";
-import { doc, setDoc, updateDoc } from "firebase/firestore";
 import OpenAIService from "../../../services/openai.service";
+import ReportService from "../../../services/report.service";
 import statusMessages from "../../../configs/statusMessages";
 import { CheckIcon, ExclamationTriangleIcon } from "@heroicons/vue/24/outline";
+import { useRouter } from "vue-router";
 
+const router = useRouter();
 const props = defineProps({
   homeId: {
     type: String,
@@ -31,21 +32,22 @@ const currentIcon = ref(statusMessages[0].icon);
 let messageInterval = null;
 
 onMounted(() => {
-  reportId.value = uuidv4();
+  startMessageCycle();
   performAnalysis();
+});
 
-  // Start cycling through status messages
+onUnmounted(() => {
+  clearInterval(messageInterval);
+});
+
+const startMessageCycle = () => {
   messageInterval = setInterval(() => {
     currentMessageIndex.value =
       (currentMessageIndex.value + 1) % statusMessages.length;
     currentMessage.value = statusMessages[currentMessageIndex.value].message;
     currentIcon.value = statusMessages[currentMessageIndex.value].icon;
   }, 3000);
-});
-
-onUnmounted(() => {
-  clearInterval(messageInterval);
-});
+};
 
 const performAnalysis = async () => {
   try {
@@ -58,18 +60,34 @@ const performAnalysis = async () => {
       props.utilityBillFullpath
     );
 
+    // Create report data
+    const reportData = {
+      homeId: props.homeId,
+      utilityBillAnalysis: result.analysis,
+    };
+
+    // Store report in Firestore
+    const report = await ReportService.createReport(props.homeId, reportData);
+    reportId.value = report.id;
+
     analysisStatus.value = "complete";
     clearInterval(messageInterval);
-
-    console.log("result", result);
-
-    analysisStatus.value = "complete";
   } catch (err) {
     console.error("Error analyzing home:", err);
     error.value = err.message;
     analysisStatus.value = "error";
     clearInterval(messageInterval);
   }
+};
+
+const viewReport = () => {
+  router.push({
+    name: "report",
+    query: {
+      homeId: props.homeId,
+      reportId: reportId.value,
+    },
+  });
 };
 </script>
 
@@ -88,18 +106,16 @@ const performAnalysis = async () => {
     </div>
 
     <!-- Complete -->
-    <div v-if="analysisStatus === 'complete'">
+    <div v-if="analysisStatus === 'complete'" class="space-y-4">
       <div
         class="w-10 h-10 flex items-center justify-center rounded-md bg-primary-100 mx-auto"
       >
         <CheckIcon class="h-6 w-6 text-primary-500" />
       </div>
-      <div class="text-xl font-semibold text-primary-900 mx-auto mt-4">
+      <div class="text-xl font-semibold text-primary-900">
         Analysis Complete!
       </div>
-      <button @click="$router.push('/report')" class="btn-primary mt-4">
-        View Report
-      </button>
+      <button @click="viewReport" class="btn-primary">View Report</button>
     </div>
 
     <!-- Error -->
