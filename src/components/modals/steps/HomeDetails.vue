@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from "vue";
+import { ref, computed, watch } from "vue";
 import { useAuthStore } from "../../../stores/auth";
 import { useFirebaseStorage } from "../../../composables/useFirebaseStorage";
 
@@ -12,17 +12,17 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update:homeName"]);
+const emit = defineEmits(["homeDetailsComplete"]);
 
 const authStore = useAuthStore();
 const homeName = ref("");
-const utilityBillUrl = ref(null);
+const utilityBillFullpath = ref(null);
 const selectedBillFile = ref(null);
 const billPreviewUrl = ref(null);
 const isDragging = ref(false);
 
 const isNextButtonEnabled = computed(() => {
-  return homeName.value !== "" && utilityBillUrl.value !== null;
+  return homeName.value !== "" && utilityBillFullpath.value !== null;
 });
 
 const handleBillSelect = async (event) => {
@@ -34,14 +34,21 @@ const handleBillSelect = async (event) => {
     try {
       const userId = authStore.user.id;
       const storagePath = `users/${userId}/homes/${props.homeId}/utilityBills`;
-      utilityBillUrl.value = await uploadFile(file, storagePath);
-      console.log("imgUrl", imgUrl);
+      utilityBillFullpath.value = await uploadFile(file, storagePath);
+      console.log("utilityBillFullpath.value", utilityBillFullpath.value);
+      console.log("uploadStatus", uploadStatus);
     } catch (error) {
       console.error("Error uploading utility bill:", error);
     }
   }
 };
 
+const handleNext = () => {
+  emit("homeDetailsComplete", {
+    homeName: homeName.value,
+    utilityBillFullpath: utilityBillFullpath.value,
+  });
+};
 const handleDragOver = (event) => {
   event.preventDefault();
   isDragging.value = true;
@@ -64,11 +71,6 @@ const clearBillFile = () => {
     billPreviewUrl.value = null;
   }
 };
-
-const updateHomeName = (value) => {
-  homeName.value = value;
-  emit("update:homeName", value);
-};
 </script>
 
 <template>
@@ -83,7 +85,6 @@ const updateHomeName = (value) => {
         class="form-input mt-1"
         placeholder="e.g., Main Residence"
         required
-        @input="updateHomeName($event.target.value)"
       />
       <p class="mt-2 text-sm text-gray-500">
         Choose a name that helps you identify this property easily.
@@ -224,20 +225,21 @@ const updateHomeName = (value) => {
               PDF, PNG, or JPG up to 10MB
             </p>
           </div>
-
-          <!-- Navigation Buttons -->
-          <div class="flex justify-end mt-6">
-            <button
-              type="button"
-              class="btn-primary"
-              :class="{ 'opacity-50 cursor-not-allowed': !isNextButtonEnabled }"
-              :disabled="!isNextButtonEnabled"
-            >
-              Next
-            </button>
-          </div>
         </div>
       </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="flex justify-end mt-6">
+      <button
+        type="button"
+        class="btn-primary"
+        :class="{ 'opacity-50 cursor-not-allowed': !isNextButtonEnabled }"
+        :disabled="!isNextButtonEnabled"
+        @click="handleNext"
+      >
+        Next
+      </button>
     </div>
   </div>
 </template>

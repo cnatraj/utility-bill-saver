@@ -1,4 +1,3 @@
-```vue
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useAuthStore } from "../../stores/auth";
@@ -22,6 +21,8 @@ const homesStore = useHomesStore();
 const currentStep = ref(1);
 const homeName = ref("");
 const homeId = ref(null);
+const utilityBillFullpath = ref(null);
+const assetUrls = ref([]);
 const uploadStatus = ref({
   utilityBill: { status: "pending", error: null },
   homeAssets: { status: "pending", error: null },
@@ -40,7 +41,7 @@ const steps = [
 const isFirstStep = computed(() => currentStep.value === 1);
 const isLastStep = computed(() => currentStep.value === steps.length);
 
-const nextStep = async () => {
+const nextStep = () => {
   if (!isLastStep.value) {
     currentStep.value++;
   }
@@ -67,6 +68,7 @@ const handleSubmit = async () => {
 const resetForm = () => {
   currentStep.value = 1;
   homeName.value = "";
+  assetUrls.value = [];
   uploadStatus.value = {
     utilityBill: { status: "pending", error: null },
     homeAssets: { status: "pending", error: null },
@@ -77,6 +79,22 @@ const resetForm = () => {
 const handleClose = () => {
   resetForm();
   emit("close");
+};
+
+const handleHomeDetailsComplete = (data) => {
+  console.log("handleHomeDetailsComplete");
+
+  homeName.value = data.homeName;
+  utilityBillFullpath.value = data.utilityBillFullpath;
+
+  nextStep();
+  console.log("data", data);
+};
+
+const handleAssetsComplete = (urls) => {
+  console.log("handleAssetsComplete", urls);
+  assetUrls.value = urls;
+  nextStep();
 };
 </script>
 
@@ -176,45 +194,23 @@ const handleClose = () => {
             <HomeDetails
               v-if="currentStep === 1"
               :home-id="homeId"
-              v-model:home-name="homeName"
+              @homeDetailsComplete="handleHomeDetailsComplete"
             />
 
             <!-- Step 2: Appliance Photos -->
-            <AssetDetails v-else-if="currentStep === 2" :home-id="homeId" />
+            <AssetDetails
+              v-else-if="currentStep === 2"
+              :home-id="homeId"
+              @assetsComplete="handleAssetsComplete"
+            />
 
             <!-- Step 3: Finalizing -->
             <Finalizing
               v-else-if="currentStep === 3"
               :home-id="homeId"
-              :upload-status="uploadStatus"
+              :utility-bill-fullpath="utilityBillFullpath"
+              :asset-urls="assetUrls"
             />
-
-            <!-- Navigation Buttons -->
-            <div class="flex justify-between">
-              <button
-                v-if="!isFirstStep && currentStep !== 3"
-                type="button"
-                class="btn-outline"
-                @click="previousStep"
-              >
-                Back
-              </button>
-              <div class="ml-auto flex space-x-4">
-                <button
-                  v-if="!isLastStep"
-                  type="button"
-                  class="btn-primary"
-                  :class="{ 'opacity-50 cursor-not-allowed': !homeName }"
-                  :disabled="!homeName"
-                  @click="nextStep"
-                >
-                  Next
-                </button>
-                <button v-else type="submit" class="btn-primary">
-                  Add Home
-                </button>
-              </div>
-            </div>
           </form>
         </div>
       </div>
